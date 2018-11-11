@@ -74,7 +74,10 @@ module.exports = Population = class Population{
             var dot = this.dots[i]
             var portion = dot.fitness/fitnessSum
             if(rnd>=min&&rnd<=min+portion){
-                return new Dot(this.app, dot.brain.mutatedDirections(0.02))
+                var mutationConstant = 0.02
+                if(this.minStep<=190)
+                    mutationConstant = 0.01
+                return new Dot(this.app, dot.brain.mutatedDirections(mutationConstant))
             }
             min+=portion
         }

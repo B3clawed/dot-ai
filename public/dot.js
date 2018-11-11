@@ -1,10 +1,15 @@
 var Vector = require('victor')
 
 module.exports = Dot = class Dot {
-    constructor(app){
+    constructor(app, directions = null, best = false){
         this.renderer = app.renderer
         this.stage = app.stage
-        this.brain = new Brain(800)
+        this.best = best
+        if(directions==null)
+            this.brain = new Brain(800)
+        else{
+            this.brain = new Brain(800, directions)
+        }
         this.dead = false
         this.finish = false
         this.logged = false
@@ -16,8 +21,14 @@ module.exports = Dot = class Dot {
 
     draw(){
         this.dotGraphics = new PIXI.Graphics()
-        this.dotGraphics.lineStyle(2, 0xFFFFFF)
-        this.dotGraphics.beginFill(0xFFFFFF)
+        if(this.best){
+            this.dotGraphics.lineStyle(2, 0x00FF00)
+            this.dotGraphics.beginFill(0x00FF00) 
+        }
+        else{
+            this.dotGraphics.lineStyle(2, 0xFFFFFF)
+            this.dotGraphics.beginFill(0xFFFFFF) 
+        }
         this.dotGraphics.drawCircle(this.pos.x, this.pos.y, 2)
         this.dotGraphics.endFill()
         this.stage.addChild(this.dotGraphics)
@@ -31,11 +42,12 @@ module.exports = Dot = class Dot {
             }
             else
                 this.dead = true
+            
             this.vel.add(this.acc)
             this.vel.limitMag(3)
             this.pos.add(this.vel)
             
-            this.stage.removeChild(this.dotGraphics)
+            this.clearDot()
             this.draw()
             if(this.goal.distance(this.pos) <= 5){
                 this.finish = true
@@ -43,18 +55,22 @@ module.exports = Dot = class Dot {
             }
             if(this.pos.y <= 0 || this.pos.y >= this.renderer.height || this.pos.x <= 0 || this.pos.x >= this.renderer.width)
                 this.dead = true
+            
 
-            this.calcFitness()
         }
+    }
+
+    clearDot(){
+        this.stage.removeChild(this.dotGraphics)
     }
 
     calcFitness(){
         var dist = this.goal.distance(this.pos)
-        if(dist>5){
+        if(!this.finish){
             this.fitness = 1.0/(dist*dist)
         }
         else{
-            this.fitness = (1.0/25.0) + (1.0/(this.brain.step*this.brain.step))
+            this.fitness = (1.0/25.0) + (1.0/(this.brain.step*this.brain.step))*35882.9
         }
     }
 }

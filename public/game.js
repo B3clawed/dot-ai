@@ -3,7 +3,9 @@ require('./brain.js')
 require('./dot.js')
 require('./population.js')
 
-let stage, app, dots
+let stage, app, dots, 
+    reset = false,
+    gen = 0
 
 initApp()
 drawGraphics()
@@ -28,5 +30,14 @@ function drawGraphics(){
 }
 
 function gameLoop(delta){
-    dots.update()
+    dots.update(value => {
+        if(value!==0){
+            gen++
+            console.log(`GENERATION: ${gen}, ${value.finished} dots finished and ${value.died} dots died`)
+            dots.newGen()
+            dots.draw()
+        }
+    })
+    
+
 }
